@@ -1,0 +1,11 @@
+{
+  "name": "beatdrop-web",
+  "version": "1.0.0",
+  "description": "Interactive Music Trivia & Timeline Card Game with 3D Cards and Spotify Playback",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "build:apk": "./build-tv-apk.sh"
+  }
+}

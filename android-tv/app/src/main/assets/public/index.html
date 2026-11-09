@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>BEATDROP — Interactive Music Card Game</title>
+  <link rel="icon" type="image/png" href="/icon-192.png" />
+  <link rel="apple-touch-icon" href="/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <!-- Ambient Neon Stage Background -->
+  <div class="ambient-bg">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- Top Navigation Bar -->
+  <header class="top-bar">
+    <div class="brand">
+      <div class="brand-disc">
+        <div class="brand-disc-inner"></div>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">BEATDROP</span>
+        <span class="brand-subtitle" id="currentEditionBadge">Original UK Edition</span>
+      </div>
+    </div>
+
+    <div class="mode-switcher" role="tablist" aria-label="Game Mode">
+      <button class="mode-tab active" data-mode="quickfire" id="modeQuickfireBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span>Quickfire Party</span>
+      </button>
+      <button class="mode-tab" data-mode="party" id="modePartyBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="12" y2="16"/></svg>
+        <span>Timeline Mode</span>
+      </button>
+      <button class="mode-tab" data-mode="lookup" id="modeLookupBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>Card # Lookup</span>
+      </button>
+    </div>
+
+    <div class="top-actions">
+      <button class="action-pill custom-playlist-pill" id="customPlaylistBtn" title="Import or Sync a Custom Spotify Playlist">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>Custom Playlist</span>
+      </button>
+      <button class="action-pill" id="editionSelectBtn" title="Change Music Edition">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span id="editionBtnLabel">Edition</span>
+      </button>
+      <button class="action-pill spotify-pill" id="spotifyConnectBtn" title="Configure Spotify Account">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+        <span id="spotifyStatusText">Spotify Ready</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="game-layout">
+    <!-- Score & Player Strip (Quickfire & Timeline Modes) -->
+    <section class="players-strip" id="playersStrip">
+      <div class="players-list" id="playersList"></div>
+      <div class="deck-counter">
+        <span class="deck-label">CARDS LEFT</span>
+        <span class="deck-count" id="deckCountLabel">308</span>
+      </div>
+      <button class="mini-btn" id="newGameBtn" title="Manage Players &amp; Reset Scores">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        <span>Players / Reset</span>
+      </button>
+    </section>
+
+    <!-- Card Number Lookup Bar (Lookup Mode) -->
+    <section class="lookup-bar hidden" id="lookupBar">
+      <div class="lookup-input-group">
+        <label for="cardNumberInput">Enter Physical Card #</label>
+        <div class="lookup-controls">
+          <input type="number" id="cardNumberInput" min="1" max="2500" placeholder="e.g. 00042" />
+          <button class="primary-btn" id="loadCardNumBtn">Load Card</button>
+          <button class="secondary-btn" id="randomLookupBtn">Random Card</button>
+        </div>
+      </div>
+      <p class="lookup-hint">Type any card number from <strong id="lookupEditionName">this edition</strong> to play the track and flip the card.</p>
+    </section>
+
+    <!-- Center Stage: Physical Deck & 3D Interactive Card -->
+    <section class="stage-area">
+      <!-- Physical Draw Deck Stack -->
+      <div class="deck-area" id="deckArea">
+        <div class="card-stack" id="drawDeckStack" role="button" tabindex="0" aria-label="Draw next song card">
+          <div class="stack-layer layer-3"></div>
+          <div class="stack-layer layer-2"></div>
+          <div class="stack-layer layer-1">
+            <div class="deck-back-art">
+              <div class="vinyl-rings"></div>
+              <span class="deck-logo">BEATDROP</span>
+              <span class="deck-cta" id="deckCtaText">TAP TO DRAW</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active 3D Card Stage -->
+      <div class="active-card-zone" id="activeCardZone">
+        <div class="empty-stage-prompt" id="emptyStagePrompt">
+          <div class="pulse-ring"></div>
+          <h2 id="emptyStageTitle">Ready to Drop the Beat?</h2>
+          <p id="emptyStageDesc">Draw a random mystery card, listen to the track, and be the first player to shout out the Artist &amp; Song!</p>
+          <button class="primary-btn glow-btn" id="drawFirstCardBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Draw Card &amp; Play Track</span>
+          </button>
+        </div>
+
+        <!-- 3D Card Container -->
+        <div class="card-scene hidden" id="cardScene">
+          <div class="card-3d" id="card3d">
+            <!-- FRONT OF CARD (Mystery / Vinyl Side with Card Number) -->
+            <div class="card-face card-front" id="cardFront">
+              <div class="card-glare" id="cardGlareFront"></div>
+              <div class="card-top-meta">
+                <span class="card-edition-tag" id="cardEditionTag">EDITION</span>
+                <span class="card-number-badge" id="cardNumberBadge">#00001</span>
+              </div>
+
+              <!-- Spinning Vinyl Record Player inside the card -->
+              <div class="card-vinyl-wrapper">
+                <div class="vinyl-disc" id="vinylDisc">
+                  <div class="vinyl-grooves"></div>
+                  <div class="vinyl-Reflections"></div>
+                  <div class="vinyl-label" id="vinylCenterLabel">
+                    <span class="vinyl-card-num" id="vinylCardNum">001</span>
+                    <div class="vinyl-spindle"></div>
+                  </div>
+                </div>
+                <div class="tonearm" id="tonearm"></div>
+              </div>
+
+              <!-- Audio Visualizer Bars -->
+              <div class="audio-visualizer" id="audioVisualizer">
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span>
+              </div>
+
+              <!-- Playback Controls directly on the Mystery Card -->
+              <div class="card-player-controls">
+                <button class="play-toggle-btn" id="playPauseBtn" aria-label="Play or Stop Track">
+                  <svg class="icon-play" id="iconPlay" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+                  <svg class="icon-pause hidden" id="iconPause" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+                </button>
+                <div class="track-progress-wrap">
+                  <div class="track-status-row">
+                    <span id="playbackStatusLabel">Loading track...</span>
+                    <span id="playbackTimer">0:00</span>
+                  </div>
+                  <div class="progress-bar-bg" id="progressBarBg">
+                    <div class="progress-bar-fill" id="progressBarFill"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-front-footer">
+                <span class="artist-type-pill" id="artistTypePill">Mystery Track</span>
+                <span class="tap-flip-hint">Guess before revealing!</span>
+              </div>
+            </div>
+
+            <!-- BACK OF CARD (Revealed Year, Artist, Title & Cover Art) -->
+            <div class="card-face card-back" id="cardBack">
+              <div class="card-glare" id="cardGlareBack"></div>
+              <div class="card-back-bg" id="cardBackBg"></div>
+              <div class="card-back-content">
+                <div class="card-top-meta">
+                  <span class="card-edition-tag" id="cardBackEditionTag">EDITION</span>
+                  <span class="card-number-badge" id="cardBackNumberBadge">#00001</span>
+                </div>
+
+                <div class="reveal-cover-wrap">
+                  <img id="revealCoverImg" src="" alt="Album Cover" class="reveal-cover-img" />
+                  <div class="reveal-year-badge" id="revealYear">1985</div>
+                </div>
+
+                <div class="reveal-track-info">
+                  <h3 class="reveal-artist" id="revealArtist">Artist Name</h3>
+                  <p class="reveal-title" id="revealTitle">Song Title</p>
+                </div>
+
+                <div class="reveal-actions-row">
+                  <button class="mini-play-btn" id="backPlayPauseBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span id="backPlayBtnText">Listen</span>
+                  </button>
+                  <a id="openSpotifyLink" href="#" target="_blank" rel="noopener noreferrer" class="spotify-open-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                    <span>Spotify</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage Control Panel (Guess Input / Reveal Button / Verdict) -->
+        <div class="stage-controls hidden" id="stageControls">
+          <!-- Pre-reveal instructions & optional inputs -->
+          <div class="guess-box" id="guessBox">
+            <div class="guess-inputs" id="guessInputsContainer">
+              <input type="text" id="guessArtistInput" placeholder="Guess Artist or Song (optional)..." autocomplete="off" />
+              <input type="number" id="guessYearInput" placeholder="Year (e.g. 1994)" min="1900" max="2030" />
+            </div>
+            <p class="timeline-prompt" id="timelinePromptText">
+              <span>First player to call out the Artist &amp; Song stops the track and flips the card!</span>
+            </p>
+          </div>
+
+          <div class="main-stage-buttons">
+            <button class="stop-reveal-btn" id="revealCardBtn">
+              <span class="btn-Flip-icon">↻</span>
+              <span id="revealBtnText">Stop &amp; Flip Card to Reveal</span>
+            </button>
+            <button class="secondary-btn hidden" id="flipBackBtn">
+              <span>Flip Card Over</span>
+            </button>
+          </div>
+
+          <!-- QUICKFIRE PARTY MODE: Post-Reveal Success / Failure & Player Tally Assignment -->
+          <div class="quickfire-judge-panel hidden" id="quickfireJudgePanel">
+            <div class="judge-header" id="judgeHeaderLabel">Did someone guess it right?</div>
+
+            <!-- Step 1: Choose Success or Failure -->
+            <div class="judge-outcome-buttons" id="judgeOutcomeButtons">
+              <button class="judge-btn judge-success-btn" id="judgeSuccessBtn">
+                <span class="judge-emoji">✅</span>
+                <span>Success!</span>
+              </button>
+              <button class="judge-btn judge-fail-btn" id="judgeFailBtn">
+                <span class="judge-emoji">❌</span>
+                <span>Failure / Nobody Got It</span>
+              </button>
+            </div>
+
+            <!-- Step 2: Assign Point to Player (shown when Success is clicked, or directly clickable) -->
+            <div class="assign-player-panel hidden" id="assignPlayerPanel">
+              <span class="assign-label">Who guessed correctly? Tap to award +1 point:</span>
+              <div class="assign-players-grid" id="assignPlayersGrid"></div>
+            </div>
+
+            <!-- Step 3: Confirmation & Next Card button -->
+            <div class="quickfire-result-bar hidden" id="quickfireResultBar">
+              <div class="quickfire-result-msg" id="quickfireResultMsg">Point awarded!</div>
+              <button class="primary-btn glow-btn full-width-btn" id="quickfireNextCardBtn">
+                <span>Draw Next Card →</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- TIMELINE & LOOKUP MODE: Verdict Banner after Revealing -->
+          <div class="verdict-panel hidden" id="verdictPanel">
+            <div class="verdict-banner" id="verdictBanner">
+              <span class="verdict-icon" id="verdictIcon">🎉</span>
+              <div class="verdict-text-wrap">
+                <strong id="verdictTitle">Spot On!</strong>
+                <span id="verdictSubtitle">Placed accurately on the timeline!</span>
+              </div>
+            </div>
+
+            <div class="post-reveal-actions">
+              <button class="token-award-btn" id="awardTokenBtn" title="Award +1 Bonus Token for naming Artist & Song">
+                <span>🪙 +1 Token (Guessed Artist &amp; Song!)</span>
+              </button>
+              <button class="primary-btn next-turn-btn" id="nextCardBtn">
+                <span>Next Card →</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Fallback Spotify Official Embed Drawer -->
+          <div class="spotify-embed-drawer hidden" id="spotifyEmbedDrawer">
+            <div class="embed-spoiler-shield" id="embedSpoilerShield">
+              <span>🔒 Title hidden until reveal — Use Play/Pause above</span>
+              <button class="mini-text-btn" id="toggleRawEmbedBtn">Show Widget</button>
+            </div>
+            <div class="spotify-iframe-container" id="spotifyIframeContainer"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Player's Chronological Music Timeline (Timeline Mode Only) -->
+    <section class="timeline-section hidden" id="timelineSection">
+      <div class="timeline-header">
+        <div class="timeline-title-group">
+          <h3><span id="activePlayerTimelineName">Player 1</span>'s Music Timeline</h3>
+          <span class="timeline-goal-badge" id="timelineProgressBadge">1 / 10 Cards to Win</span>
+        </div>
+        <div class="timeline-hint-legend">
+          <span class="legend-dot"></span> Tap a <strong>+ Place Here</strong> slot to lock in where this song belongs chronologically!
+        </div>
+      </div>
+
+      <div class="timeline-scroll-wrapper" id="timelineScrollWrapper">
+        <div class="timeline-track" id="timelineTrack">
+          <!-- Dynamically populated timeline cards and drop slots -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Edition / Gameset Picker Modal -->
+  <div class="modal-backdrop hidden" id="editionModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Choose Music Edition</h2>
+        <button class="modal-close" id="closeEditionModalBtn" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-search-bar">
+        <input type="text" id="editionSearchInput" placeholder="Search 173 editions (e.g. UK, US, Guilty Pleasures, Rock, Summer)..." />
+      </div>
+      <div class="editions-grid" id="editionsList">
+        <!-- Populated from /api/gamesets -->
+      </div>
+    </div>
+  </div>
+
+  <!-- New Game / Player Setup Modal -->
+  <div class="modal-backdrop hidden" id="setupModal">
+    <div class="modal-card small-modal">
+      <div class="modal-header">
+        <h2>Players &amp; Score Setup</h2>
+        <button class="modal-close" id="closeSetupModalBtn" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label class="field-label">Players / Teams (1 to 8)</label>
+        <div class="setup-players-inputs" id="setupPlayersInputs">
+          <input type="text" class="player-name-input" value="Player 1" placeholder="Player 1 Name" />
+          <input type="text" class="player-name-input" value="Player 2" placeholder="Player 2 Name" />
+          <input type="text" class="player-name-input" value="Player 3" placeholder="Player 3 Name" />
+        </div>
+        <button class="secondary-btn add-player-btn" id="addPlayerInputBtn">+ Add Another Player</button>
+
+        <div class="setup-field-row">
+          <label class="field-label" for="cardsToWinSelect">Points / Cards Needed to Win</label>
+          <select id="cardsToWinSelect" class="styled-select">
+            <option value="5">5 Points / Cards (Quick Game)</option>
+            <option value="10" selected>10 Points / Cards (Standard Game)</option>
+            <option value="15">15 Points / Cards (Marathon)</option>
+            <option value="999">Unlimited (Free Play Tally)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="primary-btn full-width-btn" id="startNewGameConfirmBtn">Save Players &amp; Start</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spotify Connection / Audio Settings Modal -->
+  <div class="modal-backdrop hidden" id="spotifyModal">
+    <div class="modal-card small-modal">
+      <div class="modal-header">
+        <h2>Spotify Playback &amp; Account</h2>
+        <button class="modal-close" id="closeSpotifyModalBtn" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="info-callout">
+          <strong>Zero-Setup Instant Play Active!</strong>
+          <p>This app automatically fetches song titles, artists, release years, cover art, and 30-second audio previews directly from Spotify — even without logging in.</p>
+        </div>
+
+        <hr class="modal-divider" />
+
+        <h3>Link Your Spotify Premium (Full-Track Web Playback SDK)</h3>
+        <p class="modal-subtext">Want to stream full-length tracks directly inside this browser tab instead of 30s previews? Connect with your Spotify Developer Client ID or paste a Web Playback Bearer Token.</p>
+
+        <div class="form-group">
+          <label class="field-label" for="spotifyClientIdInput">Spotify App Client ID (PKCE OAuth)</label>
+          <input type="text" id="spotifyClientIdInput" placeholder="e.g. 4b9f8c... (from developer.spotify.com)" />
+          <span class="field-help">Redirect URI to add in Spotify Dashboard: <code id="redirectUriDisplay"></code></span>
+        </div>
+
+        <button class="spotify-login-btn" id="spotifyOAuthLoginBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          <span>Authenticate with Spotify PKCE</span>
+        </button>
+
+        <div class="form-group" style="margin-top: 16px;">
+          <label class="field-label" for="spotifyTokenInput">Or Paste Access Token Directly</label>
+          <input type="password" id="spotifyTokenInput" placeholder="Paste Spotify Bearer Access Token..." />
+        </div>
+
+        <div class="modal-footer-row">
+          <button class="secondary-btn" id="clearSpotifyTokenBtn">Disconnect</button>
+          <button class="primary-btn" id="saveSpotifySettingsBtn">Save Token</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Spotify Playlist Studio & Sync Modal -->
+  <div class="modal-backdrop hidden" id="playlistModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Custom Spotify Playlist Studio</h2>
+        <button class="modal-close" id="closePlaylistModalBtn" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-subtext">
+          Create a custom game deck for any genre, decade, or artist! Paste a public Spotify playlist link below. Whenever you add new songs to your playlist on Spotify, click <strong>Check for New Tracks</strong> to sync and see what's new!
+        </p>
+
+        <div class="playlist-import-form">
+          <div class="form-group">
+            <label class="field-label" for="playlistUrlInput">Spotify Playlist URL or ID</label>
+            <input type="text" id="playlistUrlInput" placeholder="https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M" />
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="playlistNameInput">Custom Game Edition Title (Optional)</label>
+            <input type="text" id="playlistNameInput" placeholder="e.g. 90s Indie Rock Night / Kids Pop Party" />
+          </div>
+          <div class="playlist-form-actions">
+            <button class="primary-btn" id="syncPlaylistSubmitBtn">
+              <span>Import / Check for New Tracks</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sync Diff & New Track Report Banner -->
+        <div class="sync-report-card hidden" id="syncReportCard">
+          <div class="sync-report-header">
+            <strong id="syncReportTitle">Playlist Synced!</strong>
+            <div class="sync-filter-controls" id="syncPlayActions">
+              <button class="primary-btn mini-play-deck-btn" id="playAllCustomBtn">Play All Tracks</button>
+              <button class="secondary-btn mini-play-deck-btn hidden" id="playOnlyNewCustomBtn">Play ONLY New Tracks</button>
+            </div>
+          </div>
+          <div class="sync-stats-grid" id="syncStatsGrid"></div>
+          <div class="sync-new-tracks-list hidden" id="syncNewTracksList"></div>
+        </div>
+
+        <hr class="modal-divider" />
+
+        <div class="saved-playlists-section">
+          <h3>Your Saved Custom Playlists</h3>
+          <div class="saved-playlists-list" id="savedPlaylistsList">
+            <p class="modal-subtext">No custom playlists imported yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Winner Celebration Modal -->
+  <div class="modal-backdrop hidden" id="winnerModal">
+    <div class="modal-card small-modal winner-card">
+      <div class="winner-trophy">🏆</div>
+      <h2 id="winnerTitle">Player 1 Wins!</h2>
+      <p id="winnerSubtitle">Crown the new music champion!</p>
+      <button class="primary-btn glow-btn full-width-btn" id="playAgainWinnerBtn">Play Another Match</button>
+    </div>
+  </div>
+
+  <!-- Synced TV Room Corner Overlay (Only visible when opened at /tv) -->
+  <div class="tv-room-corner hidden" id="tvRoomCorner">
+    <div class="tv-qr-box">
+      <img id="tvQrImg" src="" alt="Scan to Join as Phone Remote" class="tv-qr-img" />
+    </div>
+    <div class="tv-room-info">
+      <span class="tv-room-tag">📱 PHONE REMOTE</span>
+      <strong class="tv-room-code" id="tvRoomCodeLabel">ROOM: ----</strong>
+      <span class="tv-room-url" id="tvRoomUrlLabel">Scan QR to control TV</span>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

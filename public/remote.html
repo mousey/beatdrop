@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>BEATDROP — Phone Remote Controller</title>
+  <link rel="icon" type="image/png" href="/icon-192.png" />
+  <link rel="apple-touch-icon" href="/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    body {
+      padding: 16px;
+      max-width: 480px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 100vh;
+    }
+
+    .remote-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: var(--bg-panel);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+    }
+
+    .room-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--neon-cyan);
+      background: rgba(0, 240, 255, 0.12);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      padding: 6px 12px;
+      border-radius: 99px;
+      cursor: pointer;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--spotify-green);
+      box-shadow: 0 0 8px var(--spotify-green);
+    }
+
+    .remote-card-status {
+      background: var(--bg-panel);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 22px;
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .remote-edition-tag {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .remote-card-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--neon-cyan);
+    }
+
+    .remote-revealed-box {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 190, 11, 0.4);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .remote-year {
+      font-family: var(--font-mono);
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--neon-gold);
+    }
+
+    .remote-artist {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .remote-title {
+      font-size: 0.95rem;
+      color: var(--neon-cyan);
+    }
+
+    .remote-pad {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .big-remote-btn {
+      width: 100%;
+      padding: 20px;
+      border-radius: 18px;
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+      transition: transform 0.12s ease;
+    }
+
+    .big-remote-btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-draw {
+      background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    }
+
+    .btn-reveal {
+      background: linear-gradient(135deg, #ff2a85, #ff6b00);
+    }
+
+    .btn-playpause {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      padding: 15px;
+      font-size: 1rem;
+    }
+
+    .remote-section-card {
+      background: var(--bg-panel);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .remote-section-card h3 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .remote-players-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .remote-player-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .remote-player-row.awarded {
+      border-color: var(--spotify-green);
+      background: rgba(30, 215, 96, 0.18);
+    }
+
+    .remote-player-name {
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .remote-player-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .remote-score-pill {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      color: var(--neon-gold);
+      font-size: 0.95rem;
+      min-width: 55px;
+      text-align: right;
+    }
+
+    .award-win-btn {
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--spotify-green);
+      background: rgba(30, 215, 96, 0.2);
+      color: var(--spotify-green);
+      font-family: var(--font-sans);
+      font-weight: 800;
+      font-size: 0.84rem;
+      cursor: pointer;
+    }
+
+    .remote-player-row.awarded .award-win-btn {
+      background: var(--spotify-green);
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-bg">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+  </div>
+
+  <!-- Top Bar -->
+  <header class="remote-header" style="position:relative;z-index:10;">
+    <div class="brand">
+      <div class="brand-disc"><div class="brand-disc-inner"></div></div>
+      <div class="brand-text">
+        <span class="brand-title" style="font-size:1.15rem;">BEATDROP</span>
+        <span class="brand-subtitle">Phone TV Controller</span>
+      </div>
+    </div>
+    <button class="room-badge" id="changeRoomBtn" title="Tap to change TV Room Code">
+      <span class="status-dot" id="connDot"></span>
+      <span id="roomCodeBadge">ROOM: ----</span>
+    </button>
+  </header>
+
+  <!-- Live TV Card Status -->
+  <section class="remote-card-status" style="position:relative;z-index:10;">
+    <span class="remote-edition-tag" id="remoteEditionLabel">Connected to TV Stage</span>
+    <div class="remote-card-num" id="remoteCardNum">Ready to Draw</div>
+
+    <div class="remote-revealed-box hidden" id="remoteRevealedBox">
+      <div class="remote-year" id="remoteYear">1985</div>
+      <div class="remote-artist" id="remoteArtist">Artist Name</div>
+      <div class="remote-title" id="remoteTitle">Track Title</div>
+    </div>
+  </section>
+
+  <!-- Main Remote Action Pad -->
+  <section class="remote-pad" style="position:relative;z-index:10;">
+    <button class="big-remote-btn btn-draw" id="remoteDrawBtn">
+      <span>🎴 Draw Next Mystery Card</span>
+    </button>
+
+    <button class="big-remote-btn btn-reveal hidden" id="remoteRevealBtn">
+      <span>↻ Stop &amp; Flip Card on TV</span>
+    </button>
+
+    <button class="big-remote-btn btn-playpause hidden" id="remotePlayPauseBtn">
+      <span id="remotePlayPauseLabel">⏯ Pause / Resume Track</span>
+    </button>
+  </section>
+
+  <!-- Post-Reveal Judge & Player Tally Controls -->
+  <section class="remote-section-card" style="position:relative;z-index:10;">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h3>Players &amp; Score Tally</h3>
+      <button class="mini-btn" id="remoteNobodyBtn">❌ Nobody Got It</button>
+    </div>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin-top:-6px;">Tap <strong>+1 Win</strong> next to whichever player guessed the song!</p>
+    <div class="remote-players-list" id="remotePlayersList"></div>
+  </section>
+
+  <!-- Switch Edition / Custom Playlist from Phone -->
+  <section class="remote-section-card" style="position:relative;z-index:10;">
+    <h3>TV Deck &amp; Players Setup</h3>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="primary-btn full-width-btn" id="remoteCustomPlaylistBtn" style="background:linear-gradient(135deg,#00c6ff,#0072ff);">➕ Add / Sync Spotify Playlist</button>
+      <div style="display:flex;gap:10px;">
+        <button class="secondary-btn full-width-btn" id="remoteChangeEditionBtn">🌍 Switch Edition</button>
+        <button class="secondary-btn full-width-btn" id="remoteEditPlayersBtn">👥 Edit Players</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Custom Spotify Playlist Studio Modal on Phone Remote -->
+  <div class="modal-backdrop hidden" id="remotePlaylistModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Spotify Playlist Studio</h2>
+        <button class="modal-close" id="closeRemotePlaylistBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-subtext">Paste a link from your Spotify app to create or update a custom deck and launch it straight on the TV!</p>
+        <div class="playlist-import-form">
+          <div class="form-group">
+            <label class="field-label" for="remotePlaylistUrl">Spotify Playlist URL or ID</label>
+            <input type="text" id="remotePlaylistUrl" placeholder="https://open.spotify.com/playlist/..." />
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="remotePlaylistName">Custom Title (Optional)</label>
+            <input type="text" id="remotePlaylistName" placeholder="e.g. Friday Night Throwbacks" />
+          </div>
+          <button class="primary-btn full-width-btn" id="remoteSyncPlaylistBtn">Import / Check for New Tracks</button>
+        </div>
+
+        <div class="sync-report-card hidden" id="remoteSyncReport">
+          <strong id="remoteSyncTitle" style="color:var(--neon-cyan);font-size:0.95rem;">Synced!</strong>
+          <div id="remoteSyncSummary" style="font-size:0.82rem;color:var(--text-muted);"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="primary-btn mini-play-deck-btn" id="remotePlayAllSyncedBtn">▶ Play All on TV</button>
+            <button class="secondary-btn mini-play-deck-btn hidden" id="remotePlayNewSyncedBtn">✨ Play ONLY New Tracks on TV</button>
+          </div>
+        </div>
+
+        <hr class="modal-divider" />
+        <div class="saved-playlists-section">
+          <h3>Saved Custom Playlists</h3>
+          <div class="saved-playlists-list" id="remoteSavedPlaylistsList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edition Picker Modal on Phone -->
+  <div class="modal-backdrop hidden" id="remoteEditionModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Select TV Music Edition</h2>
+        <button class="modal-close" id="closeRemoteEditionBtn">&times;</button>
+      </div>
+      <div class="modal-search-bar">
+        <input type="text" id="remoteEditionSearch" placeholder="Search custom playlists or editions..." />
+      </div>
+      <div class="editions-grid" id="remoteEditionsList"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      let roomCode = (params.get('room') || localStorage.getItem('beatdrop_remote_room') || '').toUpperCase();
+      if (!roomCode) {
+        roomCode = (prompt('Enter the 4-letter Room Code shown on your TV:', '') || 'PARTY').toUpperCase().trim();
+      }
+      localStorage.setItem('beatdrop_remote_room', roomCode);
+
+      const els = {
+        roomCodeBadge: document.getElementById('roomCodeBadge'),
+        changeRoomBtn: document.getElementById('changeRoomBtn'),
+        remoteEditionLabel: document.getElementById('remoteEditionLabel'),
+        remoteCardNum: document.getElementById('remoteCardNum'),
+        remoteRevealedBox: document.getElementById('remoteRevealedBox'),
+        remoteYear: document.getElementById('remoteYear'),
+        remoteArtist: document.getElementById('remoteArtist'),
+        remoteTitle: document.getElementById('remoteTitle'),
+        remoteDrawBtn: document.getElementById('remoteDrawBtn'),
+        remoteRevealBtn: document.getElementById('remoteRevealBtn'),
+        remotePlayPauseBtn: document.getElementById('remotePlayPauseBtn'),
+        remotePlayPauseLabel: document.getElementById('remotePlayPauseLabel'),
+        remoteNobodyBtn: document.getElementById('remoteNobodyBtn'),
+        remotePlayersList: document.getElementById('remotePlayersList'),
+        remoteChangeEditionBtn: document.getElementById('remoteChangeEditionBtn'),
+        remoteEditPlayersBtn: document.getElementById('remoteEditPlayersBtn'),
+        remoteCustomPlaylistBtn: document.getElementById('remoteCustomPlaylistBtn'),
+        remotePlaylistModal: document.getElementById('remotePlaylistModal'),
+        closeRemotePlaylistBtn: document.getElementById('closeRemotePlaylistBtn'),
+        remotePlaylistUrl: document.getElementById('remotePlaylistUrl'),
+        remotePlaylistName: document.getElementById('remotePlaylistName'),
+        remoteSyncPlaylistBtn: document.getElementById('remoteSyncPlaylistBtn'),
+        remoteSyncReport: document.getElementById('remoteSyncReport'),
+        remoteSyncTitle: document.getElementById('remoteSyncTitle'),
+        remoteSyncSummary: document.getElementById('remoteSyncSummary'),
+        remotePlayAllSyncedBtn: document.getElementById('remotePlayAllSyncedBtn'),
+        remotePlayNewSyncedBtn: document.getElementById('remotePlayNewSyncedBtn'),
+        remoteSavedPlaylistsList: document.getElementById('remoteSavedPlaylistsList'),
+        remoteEditionModal: document.getElementById('remoteEditionModal'),
+        closeRemoteEditionBtn: document.getElementById('closeRemoteEditionBtn'),
+        remoteEditionSearch: document.getElementById('remoteEditionSearch'),
+        remoteEditionsList: document.getElementById('remoteEditionsList')
+      };
+
+      els.roomCodeBadge.textContent = `ROOM: ${roomCode}`;
+      let tvState = null;
+      let gamesets = [];
+      let customPlaylists = [];
+      let lastSyncedSku = null;
+
+      function sendCommand(payload) {
+        return fetch(`/api/room/${encodeURIComponent(roomCode)}/command`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(console.error);
+      }
+
+      function connectRoomStream() {
+        const ev = new EventSource(`/api/room/${encodeURIComponent(roomCode)}/events`);
+        ev.addEventListener('state', (e) => {
+          try {
+            tvState = JSON.parse(e.data);
+            renderFromTvState(tvState);
+          } catch (_) {}
+        });
+      }
+
+      function renderFromTvState(st) {
+        if (!st) return;
+        els.remoteEditionLabel.textContent = `${st.editionName || 'Music Edition'} • ${st.deckCount ?? 0} cards left`;
+
+        if (!st.activeCard) {
+          els.remoteCardNum.textContent = 'Tap Draw Card to Start';
+          els.remoteRevealedBox.classList.add('hidden');
+          els.remoteDrawBtn.classList.remove('hidden');
+          els.remoteRevealBtn.classList.add('hidden');
+          els.remotePlayPauseBtn.classList.add('hidden');
+        } else if (!st.isRevealed) {
+          els.remoteCardNum.textContent = `Mystery Card #${st.activeCard.CardNumber}`;
+          els.remoteRevealedBox.classList.add('hidden');
+          els.remoteDrawBtn.classList.add('hidden');
+          els.remoteRevealBtn.classList.remove('hidden');
+          els.remotePlayPauseBtn.classList.remove('hidden');
+          els.remotePlayPauseLabel.textContent = st.isPlaying ? '⏸ Pause Track on TV' : '▶ Resume Track on TV';
+        } else {
+          els.remoteCardNum.textContent = `Card #${st.activeCard.CardNumber} Revealed`;
+          els.remoteDrawBtn.classList.remove('hidden');
+          els.remoteDrawBtn.innerHTML = '<span>🎴 Draw Next Card →</span>';
+          els.remoteRevealBtn.classList.add('hidden');
+          els.remotePlayPauseBtn.classList.remove('hidden');
+          els.remotePlayPauseLabel.textContent = st.isPlaying ? '⏸ Pause Track on TV' : '▶ Replay Track on TV';
+
+          if (st.activeCard.metadata) {
+            els.remoteRevealedBox.classList.remove('hidden');
+            els.remoteYear.textContent = st.activeCard.metadata.year || '????';
+            els.remoteArtist.textContent = st.activeCard.metadata.artist || '';
+            els.remoteTitle.textContent = st.activeCard.metadata.title || '';
+          }
+        }
+
+        // Render players tally list
+        els.remotePlayersList.innerHTML = '';
+        (st.players || []).forEach((p, idx) => {
+          const isAwarded = st.quickfirePointAwardedTo === idx;
+          const row = document.createElement('div');
+          row.className = `remote-player-row ${isAwarded ? 'awarded' : ''}`;
+          row.innerHTML = `
+            <span class="remote-player-name">${escapeHtml(p.name)}</span>
+            <div class="remote-player-controls">
+              <span class="remote-score-pill">🏆 ${p.score}</span>
+              <button type="button" class="award-win-btn">${isAwarded ? '✓ Awarded' : '+1 Win'}</button>
+            </div>
+          `;
+          row.querySelector('.award-win-btn').addEventListener('click', () => {
+            sendCommand({ action: 'award_player', playerIndex: idx });
+          });
+          els.remotePlayersList.appendChild(row);
+        });
+      }
+
+      els.remoteDrawBtn.addEventListener('click', () => sendCommand({ action: 'draw' }));
+      els.remoteRevealBtn.addEventListener('click', () => sendCommand({ action: 'reveal' }));
+      els.remotePlayPauseBtn.addEventListener('click', () => sendCommand({ action: 'toggle_play' }));
+      els.remoteNobodyBtn.addEventListener('click', () => sendCommand({ action: 'judge_fail' }));
+
+      els.changeRoomBtn.addEventListener('click', () => {
+        const next = prompt('Enter 4-letter TV Room Code:', roomCode);
+        if (next && next.trim()) {
+          localStorage.setItem('beatdrop_remote_room', next.trim().toUpperCase());
+          window.location.search = `?room=${encodeURIComponent(next.trim().toUpperCase())}`;
+        }
+      });
+
+      els.remoteEditPlayersBtn.addEventListener('click', () => {
+        const current = (tvState?.players || []).map(p => p.name).join(', ') || 'Player 1, Player 2, Player 3';
+        const input = prompt('Enter player names separated by commas:', current);
+        if (input) {
+          const names = input.split(',').map(s => s.trim()).filter(Boolean);
+          if (names.length > 0) {
+            sendCommand({ action: 'set_players', playerNames: names, cardsToWin: tvState?.cardsToWin || 10 });
+          }
+        }
+      });
+
+      async function refreshGamesets() {
+        const res = await fetch('/api/gamesets');
+        const data = await res.json();
+        gamesets = data.gamesets || [];
+        customPlaylists = data.customPlaylists || [];
+        renderSavedCustomPlaylistsOnRemote();
+      }
+
+      els.remoteCustomPlaylistBtn.addEventListener('click', async () => {
+        els.remotePlaylistModal.classList.remove('hidden');
+        await refreshGamesets();
+      });
+
+      els.closeRemotePlaylistBtn.addEventListener('click', () => {
+        els.remotePlaylistModal.classList.add('hidden');
+      });
+
+      els.remoteSyncPlaylistBtn.addEventListener('click', async () => {
+        const urlVal = els.remotePlaylistUrl.value.trim();
+        const nameVal = els.remotePlaylistName.value.trim();
+        if (!urlVal) {
+          alert('Paste a Spotify Playlist URL or ID first.');
+          return;
+        }
+        els.remoteSyncPlaylistBtn.disabled = true;
+        els.remoteSyncPlaylistBtn.textContent = 'Syncing with Spotify...';
+        try {
+          const res = await fetch('/api/playlists/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ playlistUrl: urlVal, customTitle: nameVal })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Failed to sync playlist');
+
+          lastSyncedSku = data.playlist.sku;
+          await refreshGamesets();
+
+          els.remoteSyncReport.classList.remove('hidden');
+          if (data.isCatalogImport) {
+            els.remoteSyncTitle.textContent = `🔓 ${data.playlist.name}`;
+            els.remoteSyncSummary.textContent = `Stored ${data.diff.totalTracks.toLocaleString()} cards across ${data.diff.newSinceLastSyncCount} editions on the TV!`;
+            els.remotePlayNewSyncedBtn.classList.add('hidden');
+          } else {
+            els.remoteSyncTitle.textContent = data.diff.isFirstImport
+              ? `✅ Imported "${data.playlist.name}" (${data.diff.totalTracks} tracks)`
+              : `🔄 Synced "${data.playlist.name}" — ${data.diff.newSinceLastSyncCount} new track(s)!`;
+            els.remoteSyncSummary.textContent = `Total: ${data.diff.totalTracks} tracks • Unique to your playlist: ${data.diff.brandNewCount ?? 0}`;
+
+            if (!data.diff.isFirstImport && data.diff.newSinceLastSyncCount > 0) {
+              els.remotePlayNewSyncedBtn.classList.remove('hidden');
+              els.remotePlayNewSyncedBtn.textContent = `✨ Play ONLY ${data.diff.newSinceLastSyncCount} New on TV`;
+            } else {
+              els.remotePlayNewSyncedBtn.classList.add('hidden');
+            }
+          }
+        } catch (err) {
+          alert(err.message);
+        } finally {
+          els.remoteSyncPlaylistBtn.disabled = false;
+          els.remoteSyncPlaylistBtn.textContent = 'Import / Check for New Tracks';
+        }
+      });
+
+      els.remotePlayAllSyncedBtn.addEventListener('click', () => {
+        if (!lastSyncedSku) return;
+        els.remotePlaylistModal.classList.add('hidden');
+        sendCommand({ action: 'select_edition', sku: lastSyncedSku, onlyNew: false });
+      });
+
+      els.remotePlayNewSyncedBtn.addEventListener('click', () => {
+        if (!lastSyncedSku) return;
+        els.remotePlaylistModal.classList.add('hidden');
+        sendCommand({ action: 'select_edition', sku: lastSyncedSku, onlyNew: true });
+      });
+
+      function renderSavedCustomPlaylistsOnRemote() {
+        if (!customPlaylists.length) {
+          els.remoteSavedPlaylistsList.innerHTML = `<p class="modal-subtext">No custom playlists saved yet.</p>`;
+          return;
+        }
+        els.remoteSavedPlaylistsList.innerHTML = '';
+        customPlaylists.forEach(pl => {
+          const item = document.createElement('div');
+          item.className = 'saved-playlist-item';
+          item.innerHTML = `
+            <div class="saved-playlist-info">
+              <div class="saved-playlist-meta">
+                <div class="saved-playlist-title">🎵 ${escapeHtml(pl.name)}</div>
+                <div class="saved-playlist-sub">${pl.cardCount} tracks (${pl.newTracksCount || 0} new)</div>
+              </div>
+            </div>
+            <div class="saved-playlist-actions">
+              <button type="button" class="secondary-btn mini-play-deck-btn btn-sync">🔄 Check New</button>
+              <button type="button" class="primary-btn mini-play-deck-btn btn-play">▶ Play on TV</button>
+            </div>
+          `;
+          item.querySelector('.btn-sync').addEventListener('click', () => {
+            els.remotePlaylistUrl.value = `https://open.spotify.com/playlist/${pl.playlistId}`;
+            els.remotePlaylistName.value = pl.name;
+            els.remoteSyncPlaylistBtn.click();
+          });
+          item.querySelector('.btn-play').addEventListener('click', () => {
+            els.remotePlaylistModal.classList.add('hidden');
+            sendCommand({ action: 'select_edition', sku: pl.sku, onlyNew: false });
+          });
+          els.remoteSavedPlaylistsList.appendChild(item);
+        });
+      }
+
+      els.remoteChangeEditionBtn.addEventListener('click', async () => {
+        els.remoteEditionModal.classList.remove('hidden');
+        await refreshGamesets();
+        renderEditions('');
+      });
+
+      els.closeRemoteEditionBtn.addEventListener('click', () => els.remoteEditionModal.classList.add('hidden'));
+      els.remoteEditionSearch.addEventListener('input', (e) => renderEditions(e.target.value));
+
+      function renderEditions(q) {
+        const query = (q || '').toLowerCase().trim();
+        els.remoteEditionsList.innerHTML = '';
+        gamesets.filter(g => g.name.toLowerCase().includes(query) || g.language.toLowerCase().includes(query)).forEach(gs => {
+          const item = document.createElement('div');
+          item.className = 'edition-item';
+          item.innerHTML = `
+            <div class="edition-item-title">${gs.isCustom ? '🎵 ' : ''}${escapeHtml(gs.name)}</div>
+            <div class="edition-item-meta">
+              <span>${escapeHtml(gs.language)}</span>
+              <span>🎴 ${gs.cardCount}</span>
+            </div>
+          `;
+          item.addEventListener('click', () => {
+            els.remoteEditionModal.classList.add('hidden');
+            sendCommand({ action: 'select_edition', sku: gs.sku });
+          });
+          els.remoteEditionsList.appendChild(item);
+        });
+      }
+
+      function escapeHtml(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      connectRoomStream();
+    })();
+  </script>
+</body>
+</html>

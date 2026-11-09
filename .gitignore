@@ -1,0 +1,16 @@
+# Keep gameset_database.json and local caches private (never uploaded to GitHub)
+gameset_database.json
+track_cache.json
+custom_playlists.json
+android-tv/app/src/main/assets/gameset_database.json
+
+# Node & Build artifacts
+node_modules/
+.DS_Store
+**/.DS_Store
+*.log
+android-tv/.gradle/
+android-tv/build/
+android-tv/app/build/
+android-tv/local.properties
+*.apk
